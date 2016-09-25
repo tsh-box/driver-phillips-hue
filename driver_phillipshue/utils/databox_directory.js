@@ -60,7 +60,7 @@ exports.register_sensor_type = function(description, done) { // requires a descr
 	});
 }
 
-exports.register_sensor = function(driver_id, actuator_type_id, controller_id, vendor_id, vendor_actuator_id, description, location, done) {
+exports.register_sensor = function(driver_id, sensor_type_id, datastore_id, vendor_id, vendor_sensor_id, unit, short_unit, description, location, done) {
 	var options = {
   		uri: databox_directory_url+'/sensor/register',
   		method: 'POST',
@@ -147,10 +147,6 @@ exports.register_actuator = function(driver_id, actuator_type_id, controller_id,
 	});
 }
 
-exports.get_registered_sensor_types = function(done) { // takes in 
-
-}
-
 exports.get_my_registered_sensors = function(vendor_id, done) {
 	var options = {
   		uri: databox_directory_url+'/vendor/'+vendor_id+'/sensor',
@@ -163,6 +159,28 @@ exports.get_my_registered_sensors = function(vendor_id, done) {
   		}
   		return done(error);
 	});
+}
+
+exports.get_datastore_id = function(hostname, done) {
+	var options = {
+  		uri: databox_directory_url+'/datastore/get_id',
+  		method: 'POST',
+  		json:
+  		{
+  			"hostname": hostname
+  		}
+	};
+
+	request(options, function (error, response, body) {
+  		if (!error && response.statusCode == 200) {
+    	 return done(body);
+  		}
+  		return done(error);
+	});
+}
+
+exports.get_registered_sensor_types = function(done) { // takes in 
+
 }
 
 exports.get_registered_actuator_types = function(done) { // takes in 

@@ -58,10 +58,6 @@ app.use(function(err, req, res, next) {
 
 var server = http.createServer(app);
 
-/**
- * Event listener functions for HTTP server
- */
-
 function onListening() {
   var addr = server.address();
   var bind = typeof addr === 'string'
