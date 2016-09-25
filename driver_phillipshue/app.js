@@ -2,6 +2,7 @@ var express = require('express');
 var path = require('path');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
+var databox_directory = require('./utils/databox_directory.js');
 
 var api = require('./routes/api');
 
@@ -95,6 +96,18 @@ function onError(error) {
 
 server.on('error', onError);
 server.on('listening', onListening);
+
+
+var vendor_id;
+databox_directory.register_vendor("Phillips_Hue", function(data) {
+  vendor_id = data.id;
+  databox_directory.register_driver("driver_phillipshue", "amazing phillips hue actuating and sensing driver", vendor_id, function(data) {
+    console.log(data);
+  });
+});
+
+
+
 server.listen(PORT, function(){
     console.log("Server listening on: http://localhost:%s", PORT);
 });
