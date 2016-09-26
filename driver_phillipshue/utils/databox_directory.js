@@ -1,8 +1,8 @@
 var request = require('request');
 
-//var databox_directory_url = "http://databox_directory:8080/api"
+var databox_directory_url = "http://databox_directory:3000/api"
 
-var databox_directory_url = "http://localhost:3001/api"
+//var databox_directory_url = "http://localhost:3000/api"
 
 exports.register_driver = function(hostname, description, vendor_id, done) { // requires a description which is most liekely the vendor name and must be unique, will return databox global vendor id
 	var options = {

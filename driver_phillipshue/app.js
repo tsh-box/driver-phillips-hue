@@ -12,7 +12,7 @@ var debug = require('debug')('driver_phillipshue:server');
 var http = require('http');
 
 // get port from env or 3000
-const PORT = 3000;
+const PORT = 9090;
 app.set('port', PORT);
 
 // view engine setup

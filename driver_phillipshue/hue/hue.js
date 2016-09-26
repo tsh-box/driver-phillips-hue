@@ -119,7 +119,7 @@ exports.list_lights = function (done) {
 
 
 exports.setup = function(done) {
-  timeout = 2000;
+  timeout = 2500;
   var hostname;
   var user;
 
@@ -138,7 +138,8 @@ exports.setup = function(done) {
   var hue2 = new HueApi();
   var displayBridges = function(bridge) {
       if(bridge)
-      {
+      { 
+        console.log(bridge);
         hostname = bridge[0].ipaddress;
         hue2.registerUser(hostname, "databox")
         .then(success_result)
