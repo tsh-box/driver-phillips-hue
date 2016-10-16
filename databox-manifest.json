@@ -1,0 +1,31 @@
+{
+	"manifest-version": 1,
+
+	"name": "phillips-hue-driver",
+	"version": "0.1.0",
+
+	"description": "A Databox driver for the phillips hue lights",
+	"author": "James Colley <James.Colley@nottingham.ac.uk> ()",
+	"license": "MIT",
+
+	"tags": [
+		"phillips",
+		"hue",
+		"bulbs"
+	],
+
+	"homepage": "https://github.com/me-box/vendor-philipshue",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/me-box/vendor-philipshue.git"
+	},
+
+	"network-permissions": [
+	],
+	"hardware-permissions": [
+	],
+
+	"resource-requirements": {
+    "store":"datastore-timeseries"
+	}
+}
