@@ -5,6 +5,8 @@ var bodyParser = require('body-parser');
 var databox_directory = require('./utils/databox_directory.js');
 
 var api = require('./routes/api');
+var config = require('./routes/config');
+var status = require('./routes/status');
 
 var app = express();
 
@@ -12,7 +14,7 @@ var debug = require('debug')('driver_phillipshue:server');
 var http = require('http');
 
 // get port from env or 3000
-const PORT = 9090;
+const PORT = 8080;
 app.set('port', PORT);
 
 // view engine setup
@@ -26,6 +28,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use('/api', api);
+app.use('/', config);
+app.use('/status', status);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -95,9 +99,9 @@ server.on('listening', onListening);
 
 
 var vendor_id;
-databox_directory.register_vendor("Phillips_Hue", function(data) {
+databox_directory.register_vendor("Phillips", function(data) {
   vendor_id = data.id;
-  databox_directory.register_driver("driver_phillipshue", "amazing phillips hue actuating and sensing driver", vendor_id, function(data) {
+  databox_directory.register_driver("hue bulbs", "amazing phillips hue actuating and sensing driver", vendor_id, function(data) {
     console.log(data);
   });
 });
