@@ -1,9 +1,20 @@
 {
-  "name": "driver_phillipshue",
+  "name": "databox-driver-phillipshue",
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "build": "docker build -t databox/databox-driver-phillipshue .",
+    "deploy": "docker tag databox/databox-driver-phillipshue registry.upintheclouds.org/databox-driver-phillipshue && docker push registry.upintheclouds.org/databox-driver-phillipshue",
+    "build-arm": "docker build -f Dockerfile-arm -t databox/databox-driver-phillipshue-arm .",
+    "deploy-arm": "docker tag databox/databox-driver-phillipshue-arm registry.upintheclouds.org/databox-driver-phillipshue-arm && docker push registry.upintheclouds.org/databox-driver-phillipshue-arm",
+    "clean": "node ./node_modules/modclean/bin/modclean.js -p ./node_modules/ -r",
+    "getshell": "docker exec -i -t databox-driver-phillipshue /bin/bash",
+    "kill": "docker kill databox-driver-phillipshue",
+    "attach": "docker attach databox-driver-phillipshue",
+    "shell": "docker run -i -t databox/databox-driver-phillipshue /bin/bash",
+    "local": "docker run -i -t databox/databox-driver-phillipshue",
+    "tail": "docker logs -f databox-driver-phillipshue"
   },
   "dependencies": {
     "body-parser": "~1.13.2",
