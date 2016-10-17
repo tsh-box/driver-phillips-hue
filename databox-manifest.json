@@ -1,7 +1,7 @@
 {
 	"manifest-version": 1,
 
-	"name": "phillips-hue-driver",
+	"name": "databox-driver-phillipshue",
 	"version": "0.1.0",
 
 	"description": "A Databox driver for the phillips hue lights",
