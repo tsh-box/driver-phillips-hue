@@ -7,12 +7,11 @@
 	"description": "A Databox driver for the phillips hue lights",
 	"author": "James Colley <James.Colley@nottingham.ac.uk> ()",
 	"license": "MIT",
-	"databox-type": "driver",
-
+	"databox-type":"driver",
 	"tags": [
-		"phillips",
-		"hue",
-		"bulbs"
+		"driver",
+		"sensor",
+		"sensors"
 	],
 
 	"homepage": "https://github.com/me-box/vendor-philipshue",
