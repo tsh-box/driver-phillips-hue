@@ -138,7 +138,7 @@ exports.setup = function(done) {
   var hue2 = new HueApi();
   var displayBridges = function(bridge) {
       console.log(bridge);
-      if(bridge)
+      if(bridge.length > 0)
       { 
         console.log(bridge);
         hostname = bridge[0].ipaddress;
