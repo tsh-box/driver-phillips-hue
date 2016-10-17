@@ -101,7 +101,7 @@ server.on('listening', onListening);
 var vendor_id;
 databox_directory.register_vendor("Phillips", function(data) {
   vendor_id = data.id;
-  databox_directory.register_driver("hue bulbs", "amazing phillips hue actuating and sensing driver", vendor_id, function(data) {
+  databox_directory.register_driver("databox-driver-phillipshues", "amazing phillips hue actuating and sensing driver", vendor_id, function(data) {
     console.log(data);
   });
 });

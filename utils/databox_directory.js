@@ -1,6 +1,6 @@
 var request = require('request');
 
-var databox_directory_url = "http://databox_directory:3000/api"
+var databox_directory_url = process.env.DATABOX_DIRECTORY_ENDPOINT;
 
 //var databox_directory_url = "http://localhost:3000/api"
 
