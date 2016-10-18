@@ -157,3 +157,31 @@ exports.setup = function(done) {
   .then(displayBridges)
   .done();
 };
+
+
+exports.fudge = function(hostname, done) {
+
+  var user;
+  var hue2 = new HueApi();
+
+  var success_result = function(result) {
+    var user_object = {user: "databox", hash: result, "hostname": hostname};
+    jsonfile.writeFile(userfile, user_object, function (err) {
+      console.error(err)
+    })
+    this.list_lights(function (complete) {
+      done(user_object);
+    });
+    
+  };
+
+  var fail_result = function(result) {
+    done(result);
+  };
+
+  hue2.registerUser(hostname, "databox")
+  .then(success_result)
+  .fail(fail_result)
+  .done();
+     
+};
