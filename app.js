@@ -3,6 +3,8 @@ var path = require('path');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var databox_directory = require('./utils/databox_directory.js');
+var hue = require('./hue/hue.js');
+var timer = require('timers');
 
 var api = require('./routes/api');
 var config = require('./routes/config');
@@ -97,14 +99,27 @@ function onError(error) {
 server.on('error', onError);
 server.on('listening', onListening);
 
-
 var vendor_id;
+var driver_id;
+
 databox_directory.register_vendor("Phillips", function(data) {
   vendor_id = data.id;
-  databox_directory.register_driver("databox-driver-phillipshues", "amazing phillips hue actuating and sensing driver", vendor_id, function(data) {
-    console.log(data);
+  databox_directory.register_driver("databox-driver-phillipshues", "amazing phillips hue actuating and sensing driver", vendor_id, function(data2) {
+    driver_id = data2.id;
+    console.log(data2);
   });
 });
+
+var data_poster = function(foo) {
+    hue.get_lights(function(lights) {
+      for (var i in lights){
+        console.log(lights[i]);
+      }
+    });     
+  console.log("hello");
+};
+
+timer.setInterval(data_poster, 2000);
 
 
 

@@ -61,6 +61,33 @@ exports.lights_off = function(light_no, done) {
 
 };
 
+exports.get_lights = function(done) {
+
+  var success_result = function(result) {
+    done(result.lights);
+  };
+
+
+  var fail_result = function(result) {
+  
+    done(result);
+  };
+
+  jsonfile.readFile(userfile, function(err, obj) {
+    if(err)
+      console.log(err)
+    else{
+      api = new HueApi(obj.hostname, obj.hash);
+      api.lights()
+      .then(success_result)
+      .fail(fail_result)
+      .done();
+    }
+  }); 
+
+}
+
+
 exports.list_lights = function (done) {
   
   var success_result = function(result) {

@@ -26,6 +26,7 @@
     "morgan": "~1.6.1",
     "node-hue-api": "^2.2.0",
     "request": "^2.75.0",
-    "serve-favicon": "~2.3.0"
+    "serve-favicon": "~2.3.0",
+    "timers": "^0.1.1"
   }
 }
