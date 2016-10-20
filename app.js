@@ -115,8 +115,11 @@ var data_poster = function(foo) {
       for (var i in lights){
         console.log(lights[i]);
       }
+      databox_directory.get_my_registered_sensors(vendor_id, function (result) {
+        console.log(result);
+      });
     });     
-  console.log("hello");
+  
 };
 
 timer.setInterval(data_poster, 2000);
