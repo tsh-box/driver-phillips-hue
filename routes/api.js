@@ -11,7 +11,21 @@ timeout = 2000; // 2 seconds
 /* GET methods for getting all data for each entity type listing. */
 router.post('/actuate', function(req, res, next) {
   		
-      var light_no = req.body.light_no;
+      /* 
+        get local light ID from databox directory actuator ID
+        get actuation method
+        get action parameter ()
+        Function  Details
+        on(value) Sets the on state, where the value is true or false
+        bri(value)  Sets the brightness, where value from 0 to 255
+        hue(value)  Sets the hue, where value from 0 to 65535
+        sat(value)  Sets the saturation value from 0 to 255
+        ct(colorTemperature)  Set the color temperature to a value between 153 and 500
+      
+      */
+
+      // TOSH NEED TO TAKE GLOBAL AND LOOKUP vendor_actuator_id 
+      var light_no = req.body.vendor_actuator_id;
       var method = req.body.method;
 
       switch(method) {
@@ -26,7 +40,6 @@ router.post('/actuate', function(req, res, next) {
             res.send(data);
           });
           break;
-
 
       }
 });

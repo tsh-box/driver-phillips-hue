@@ -102,72 +102,102 @@ exports.list_lights = function (done) {
     var driver_id;
     var lights = result.lights; 
 
-    var on_id;
-    var bri_id;
-    var hue_id;
-    var sat_id;
-    var ct_id;
+    
 
-    databox_directory.register_vendor("Phillips_Hue", function(result) {
+    databox_directory.register_vendor("Phillips", function(result) {
+      var on_id;
+      var bri_id;
+      var hue_id;
+      var sat_id;
+      var ct_id;
       vendor_id = result.id;
-      databox_directory.register_driver("driver_phillipshue", "amazing phillips hue actuating and sensing driver", vendor_id, function(result) {
+      databox_directory.register_driver("databox-driver-phillipshue", "amazing phillips hue actuating and sensing driver", vendor_id, function(result) {
         driver_id = result.id;
         databox_directory.get_datastore_id("datastore-timeseries", function(result) {
           console.log(result);
           datastore_id = result.id;
-
-
           databox_directory.register_sensor_type("bulb-on", function(result) {
             on_id = result.id;
             for (var i in lights){
               console.log(lights[i]);
               databox_directory.register_sensor(driver_id, on_id, datastore_id, vendor_id, lights[i].id, "is switched on", "on", "bulb is on or not", lights[i].name, function (result) {
                 console.log(result);
+                databox_directory.register_sensor_type("bulb-hue", function(result) {
+                  hue_id = result.id;
+                  for (var i in lights){
+                    console.log(lights[i]);
+                    databox_directory.register_sensor(driver_id, hue_id, datastore_id, vendor_id, lights[i].id, "is switched on", "on", "bulb hue", lights[i].name, function (result) {
+                      console.log(result);
+                      databox_directory.register_sensor_type("bulb-sat", function(result) {
+                        sat_id = result.id;
+                        for (var i in lights){
+                          console.log(lights[i]);
+                          databox_directory.register_sensor(driver_id, sat_id, datastore_id, vendor_id, lights[i].id, "is switched on", "on", "bulb saturation", lights[i].name, function (result) {
+                            console.log(result);
+                            databox_directory.register_sensor_type("bulb-ct", function(result) {
+                              ct_id = result.id;
+                              for (var i in lights){
+                                console.log(lights[i]);
+                                databox_directory.register_sensor(driver_id, ct_id, datastore_id, vendor_id, lights[i].id, "is switched on", "on", "bulb CT", lights[i].name, function (result) {
+                                  console.log(result);
+                                });
+                              }
+                            });
+                          });
+                        }
+                      });
+                    });
+                  }
+                });
               });
             }
           });
 
-          databox_directory.register_sensor_type("bulb-bri", function(result) {
+        }); // end get datastore id driver_id, actuator_type_id, vendor_id,  controller_id,  vendor_actuator_id, description, location, done
+
+        databox_directory.register_actuator_type("bulb-on", function(result) {
+            var on_id;
+            var bri_id;
+            var hue_id;
+            var sat_id;
+            var ct_id;
             on_id = result.id;
             for (var i in lights){
               console.log(lights[i]);
-              databox_directory.register_sensor(driver_id, bri_id, datastore_id, vendor_id, lights[i].id, "is switched on", "on", "bulb brightness", lights[i].name, function (result) {
+              databox_directory.register_actuator(driver_id, on_id, vendor_id, 1, lights[i].id, "is switched on", lights[i].name, function (result) {
                 console.log(result);
+                databox_directory.register_actuator_type("bulb-hue", function(result) {
+                  hue_id = result.id;
+                  for (var i in lights){
+                    console.log(lights[i]);
+                    databox_directory.register_actuator(driver_id, hue_id, vendor_id, 1, lights[i].id, "is switched on", lights[i].name, function (result) {
+                      console.log(result);
+                      databox_directory.register_actuator_type("bulb-sat", function(result) {
+                        sat_id = result.id;
+                        for (var i in lights){
+                          console.log(lights[i]);
+                          databox_directory.register_actuator(driver_id, sat_id, vendor_id, 1, lights[i].id, "is switched on", lights[i].name, function (result) {
+                            console.log(result);
+                            databox_directory.register_actuator_type("bulb-ct", function(result) {
+                              ct_id = result.id;
+                              for (var i in lights){
+                                console.log(lights[i]);
+                                databox_directory.register_actuator(driver_id, ct_id, vendor_id, 1, lights[i].id, "is switched on", lights[i].name, function (result) {
+                                  console.log(result);
+                                });
+                              }
+                            });
+                          });
+                        }
+                      });
+                    });
+                  }
+                });
               });
             }
           });
 
-          databox_directory.register_sensor_type("bulb-hue", function(result) {
-            on_id = result.id;
-            for (var i in lights){
-              console.log(lights[i]);
-              databox_directory.register_sensor(driver_id, on_id, datastore_id, vendor_id, lights[i].id, "is switched on", "on", "bulb hue", lights[i].name, function (result) {
-                console.log(result);
-              });
-            }
-          });
 
-          databox_directory.register_sensor_type("bulb-sat", function(result) {
-            on_id = result.id;
-            for (var i in lights){
-              console.log(lights[i]);
-              databox_directory.register_sensor(driver_id, on_id, datastore_id, vendor_id, lights[i].id, "is switched on", "on", "bulb saturation", lights[i].name, function (result) {
-                console.log(result);
-              });
-            }
-          });
-
-          databox_directory.register_sensor_type("bulb-ct", function(result) {
-            on_id = result.id;
-            for (var i in lights){
-              console.log(lights[i]);
-              databox_directory.register_sensor(driver_id, on_id, datastore_id, vendor_id, lights[i].id, "is switched on", "on", "bulb CT", lights[i].name, function (result) {
-                console.log(result);
-              });
-            }
-          });
-
-        }); // end get datastore id
       }); // end register driver
     }); // end register vendor
   }; // end success result

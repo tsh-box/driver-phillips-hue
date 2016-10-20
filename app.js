@@ -129,7 +129,7 @@ var data_poster = function(foo) {
   
 };
 
-//timer.setInterval(data_poster, 2000);
+timer.setInterval(data_poster, 10000);
 
 
 

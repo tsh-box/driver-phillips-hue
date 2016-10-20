@@ -123,7 +123,7 @@ exports.register_actuator_method = function(actuator_id, description, done) {
 	});
 }
 
-exports.register_actuator = function(driver_id, actuator_type_id, controller_id, vendor_id, vendor_actuator_id, description, location, done) {
+exports.register_actuator = function(driver_id, actuator_type_id, vendor_id,  controller_id,  vendor_actuator_id, description, location, done) {
 	var options = {
   		uri: databox_directory_url+'/actuator/register',
   		method: 'POST',
