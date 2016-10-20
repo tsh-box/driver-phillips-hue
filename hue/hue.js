@@ -90,6 +90,11 @@ exports.get_lights = function(done) {
 
 exports.list_lights = function (done) {
   
+  var fail_result = function(result) {
+    console.log("failed");
+    console.log(result);
+  };
+
   var success_result = function(result) {
     var vendor_id;
     var sensor_type_id;
@@ -107,7 +112,8 @@ exports.list_lights = function (done) {
       vendor_id = result.id;
       databox_directory.register_driver("driver_phillipshue", "amazing phillips hue actuating and sensing driver", vendor_id, function(result) {
         driver_id = result.id;
-        databox_directory.get_datastore_id("datastore_timeseries", function(result) {
+        databox_directory.get_datastore_id("datastore-timeseries", function(result) {
+          console.log(result);
           datastore_id = result.id;
 
 
@@ -115,7 +121,7 @@ exports.list_lights = function (done) {
             on_id = result.id;
             for (var i in lights){
               console.log(lights[i]);
-              databox_directory.register_sensor(driver_id, on_id, datastore_id, vendor_id, lights[i].id+"-on", "is switched on", "on", "bulb is on or not", lights[i].name, function (result) {
+              databox_directory.register_sensor(driver_id, on_id, datastore_id, vendor_id, lights[i].id, "is switched on", "on", "bulb is on or not", lights[i].name, function (result) {
                 console.log(result);
               });
             }
@@ -125,7 +131,7 @@ exports.list_lights = function (done) {
             on_id = result.id;
             for (var i in lights){
               console.log(lights[i]);
-              databox_directory.register_sensor(driver_id, bri_id, datastore_id, vendor_id, lights[i].id+"-on", "is switched on", "on", "bulb is on or not", lights[i].name, function (result) {
+              databox_directory.register_sensor(driver_id, bri_id, datastore_id, vendor_id, lights[i].id, "is switched on", "on", "bulb brightness", lights[i].name, function (result) {
                 console.log(result);
               });
             }
@@ -135,7 +141,7 @@ exports.list_lights = function (done) {
             on_id = result.id;
             for (var i in lights){
               console.log(lights[i]);
-              databox_directory.register_sensor(driver_id, on_id, datastore_id, vendor_id, lights[i].id+"-on", "is switched on", "on", "bulb is on or not", lights[i].name, function (result) {
+              databox_directory.register_sensor(driver_id, on_id, datastore_id, vendor_id, lights[i].id, "is switched on", "on", "bulb hue", lights[i].name, function (result) {
                 console.log(result);
               });
             }
@@ -145,7 +151,7 @@ exports.list_lights = function (done) {
             on_id = result.id;
             for (var i in lights){
               console.log(lights[i]);
-              databox_directory.register_sensor(driver_id, on_id, datastore_id, vendor_id, lights[i].id+"-on", "is switched on", "on", "bulb is on or not", lights[i].name, function (result) {
+              databox_directory.register_sensor(driver_id, on_id, datastore_id, vendor_id, lights[i].id, "is switched on", "on", "bulb saturation", lights[i].name, function (result) {
                 console.log(result);
               });
             }
@@ -155,7 +161,7 @@ exports.list_lights = function (done) {
             on_id = result.id;
             for (var i in lights){
               console.log(lights[i]);
-              databox_directory.register_sensor(driver_id, on_id, datastore_id, vendor_id, lights[i].id+"-on", "is switched on", "on", "bulb is on or not", lights[i].name, function (result) {
+              databox_directory.register_sensor(driver_id, on_id, datastore_id, vendor_id, lights[i].id, "is switched on", "on", "bulb CT", lights[i].name, function (result) {
                 console.log(result);
               });
             }
@@ -173,7 +179,7 @@ exports.list_lights = function (done) {
       api = new HueApi(obj.hostname, obj.hash);
       api.lights()
       .then(success_result)
-      .fail(success_result)
+      .fail(fail_result)
       .done();
     }
   }); 

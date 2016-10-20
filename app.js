@@ -107,6 +107,13 @@ databox_directory.register_vendor("Phillips", function(data) {
   databox_directory.register_driver("databox-driver-phillipshues", "amazing phillips hue actuating and sensing driver", vendor_id, function(data2) {
     driver_id = data2.id;
     console.log(data2);
+    hue.list_lights(function (done){
+      databox_directory.get_my_registered_sensors(vendor_id, function (result) {
+        console.log(result);
+      });
+    });
+
+
   });
 });
 
@@ -122,7 +129,7 @@ var data_poster = function(foo) {
   
 };
 
-timer.setInterval(data_poster, 2000);
+//timer.setInterval(data_poster, 2000);
 
 
 
