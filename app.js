@@ -101,6 +101,7 @@ server.on('listening', onListening);
 
 var vendor_id;
 var driver_id;
+var datastore_id;
 
 //TODO FIX THIS BAD THINGS HAPPEN IF databox_directory is not available !!!
 /*databox_directory.register_vendor("Phillips", function(data) {
@@ -120,20 +121,24 @@ var driver_id;
 
 databox_directory.register_driver('Phillips','databox-driver-phillipshue', 'An amazing phillips hue actuating and sensing driver')
 .then((ids) => {
-console.log(ids);
-vendor_id = ids['vendor_id'];
-driver_id = ids['driver_id'];
+  console.log(ids);
+  vendor_id = ids['vendor_id'];
+  driver_id = ids['driver_id'];
 
-return new Promise((resolve, reject) => {
-  hue.list_lights(function (err,data){  
-    if(err) {
-      reject("Can't register sensors");
-      return;
-    }
-    resolve();
+  return databox_directory.get_datastore_id('databox-store-blob');;
+})
+.then((storeid) => {
+  datastore_id = storeid;
+
+  return new Promise((resolve, reject) => {
+    hue.list_lights(vendor_id, driver_id, datastore_id, function (err,data){  
+      if(err) {
+        reject("Can't register sensors");
+        return;
+      }
+      resolve();
+    });
   });
-});
-
 })
 .catch((err) => {console.log("[Error]" + err)});
 

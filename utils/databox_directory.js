@@ -187,21 +187,23 @@ exports.get_my_registered_sensors = function(vendor_id, done) {
 }
 
 exports.get_datastore_id = function(hostname, done) {
-	var options = {
-  		uri: databox_directory_url+'/datastore/get_id',
-  		method: 'POST',
-  		json:
-  		{
-  			"hostname": hostname
-  		}
-	};
-
-	request(options, function (error, response, body) {
-  		if (!error && response.statusCode == 200) {
-    	 return done(body);
-  		}
-  		return done(error);
-	});
+  return new Promise((resolve, reject) => {
+    var options = {
+        uri: databox_directory_url+'/datastore/get_id',
+        method: 'POST',
+        json:
+        {
+          "hostname": hostname
+        }
+    };
+    request(options, function (error, response, body) {
+        if(error) {
+          reject(error);
+          return;
+        }
+        resolve(body['id']);
+    });
+  });
 }
 
 exports.get_registered_sensor_types = function(done) { // takes in 
