@@ -77,18 +77,18 @@ function onError(error) {
     throw error;
   }
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+  //var bind = typeof port === 'string'
+  //  ? 'Pipe ' + port
+  ///  : 'Port ' + port;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
     case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
+      console.error(' requires elevated privileges');
       process.exit(1);
       break;
     case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
+      console.error('port is already in use');
       process.exit(1);
       break;
     default:
@@ -102,22 +102,43 @@ server.on('listening', onListening);
 var vendor_id;
 var driver_id;
 
-databox_directory.register_vendor("Phillips", function(data) {
+//TODO FIX THIS BAD THINGS HAPPEN IF databox_directory is not available !!!
+/*databox_directory.register_vendor("Phillips", function(data) {
   vendor_id = data.id;
-  databox_directory.register_driver("databox-driver-phillipshues", "amazing phillips hue actuating and sensing driver", vendor_id, function(data2) {
+  databox_directory.register_driver("databox-driver-phillipshue", "amazing phillips hue actuating and sensing driver", vendor_id, function(data2) {
     driver_id = data2.id;
     console.log(data2);
+
+    //register the bulbs as sensors and actuators
     hue.list_lights(function (done){
       databox_directory.get_my_registered_sensors(vendor_id, function (result) {
         console.log(result);
       });
     });
+  });
+});*/
 
+databox_directory.register_driver('Phillips','databox-driver-phillipshue', 'An amazing phillips hue actuating and sensing driver')
+.then((ids) => {
+console.log(ids);
+vendor_id = ids['vendor_id'];
+driver_id = ids['driver_id'];
 
+return new Promise((resolve, reject) => {
+  hue.list_lights(function (err,data){  
+    if(err) {
+      reject("Can't register sensors");
+      return;
+    }
+    resolve();
   });
 });
 
-var data_poster = function(foo) {
+})
+.catch((err) => {console.log("[Error]" + err)});
+
+//TDOO: re-enable
+/*var data_poster = function(foo) {
     hue.get_lights(function(lights) {
       for (var i in lights){
         console.log(lights[i]);
@@ -128,8 +149,7 @@ var data_poster = function(foo) {
     });     
   
 };
-
-timer.setInterval(data_poster, 10000);
+timer.setInterval(data_poster, 10000);*/
 
 
 

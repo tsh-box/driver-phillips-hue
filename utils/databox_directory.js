@@ -2,44 +2,69 @@ var request = require('request');
 
 var databox_directory_url = process.env.DATABOX_DIRECTORY_ENDPOINT;
 
-//var databox_directory_url = "http://localhost:3000/api"
+// register datastore with directory will retry if directory is not ready 
+var register_driver = function(vendorName,driverName,driverDescription) {
+  return new Promise((resolve, reject) => {
+    
+    var vendor_id = null;
+    var driver_id = null;
 
-exports.register_driver = function(hostname, description, vendor_id, done) { // requires a description which is most liekely the vendor name and must be unique, will return databox global vendor id
-	var options = {
-  		uri: databox_directory_url+'/driver/register',
-  		method: 'POST',
-  		json: 
-  		{
-    		"description": description,
-    		"hostname": hostname,
-    		"vendor_id": vendor_id
-  		}
-	};
+    console.log("Registering vendor:: " + vendorName + " ....");
 
-	request(options, function (error, response, body) {
-  		if (!error && response.statusCode == 200) {
-    	 return done(body);
-  		}
-  		return done(error);
-	});
+    var registerCallback = function (err, data) {
+      if(err) {
+        console.log("Can not register vendor with directory! waiting 5s before retrying");
+        setTimeout(register_vendor,5000,vendorName,registerCallback);
+        return;
+      }
+      vendor_id = data['id'];
+      
+      var options = {
+                      uri: databox_directory_url+'/driver/register',
+                      method: 'POST',
+                      json: 
+                      {
+                        "description": driverDescription,
+                        "hostname": driverName,
+                        "vendor_id": vendor_id
+                      }
+                    };
+                    
+      console.log("Registering driver:: " + driverName + " ....");
+      var registerDriverCallback = function (error, response, body) {
+        if(error) {
+          console.log("Can not register driver with directory! waiting 5s before retrying");
+          setTimeout(request,5000, options,registerDriverCallback)
+          return;
+        }
+        console.log("\n------------------\n",body,"\n------------------\n");
+        driver_id = body['id'];
+        resolve({"vendor_id":vendor_id,"driver_id":driver_id}); 
+      }
+      
+      
+      request(options,registerDriverCallback);
+    
+    };
+
+    register_vendor(vendorName,registerCallback);
+  });
 }
+exports.register_driver = register_driver;
 
-exports.register_vendor = function(description, done) { // requires a description which is most liekely the vendor name and must be unique, will return databox global vendor id
-	var options = {
-  		uri: databox_directory_url+'/vendor/register',
-  		method: 'POST',
-  		json: 
-  		{
-    		"description": description	
-  		}
-	};
+var register_vendor = function(description, done) { // requires a description which is most liekely the vendor name and must be unique, will return databox global vendor id
+  var options = {
+      uri: databox_directory_url+'/vendor/register',
+      method: 'POST',
+      json: 
+      {
+        "description": description  
+      }
+  };
 
-	request(options, function (error, response, body) {
-  		if (!error && response.statusCode == 200) {
-    	 return done(body);
-  		}
-  		return done(error);
-	});
+  request(options, function (error, response, body) {
+      return done(error,body);
+  });
 }
 
 exports.register_sensor_type = function(description, done) { // requires a description which describes the catagory of sensors, if already exits then returns id 
