@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var hue = require('./../hue/hue.js');
+var databox_directory = require('./../utils/databox_directory.js');
 
  
 
@@ -11,37 +12,61 @@ timeout = 2000; // 2 seconds
 /* GET methods for getting all data for each entity type listing. */
 router.post('/actuate', function(req, res, next) {
   		
-      /* 
-        get local light ID from databox directory actuator ID
-        get actuation method
-        get action parameter ()
-        Function  Details
-        on(value) Sets the on state, where the value is true or false
-        bri(value)  Sets the brightness, where value from 0 to 255
-        hue(value)  Sets the hue, where value from 0 to 65535
-        sat(value)  Sets the saturation value from 0 to 255
-        ct(colorTemperature)  Set the color temperature to a value between 153 and 500
-      
-      */
-
-      // TOSH NEED TO TAKE GLOBAL AND LOOKUP vendor_actuator_id 
-      var light_no = req.body.vendor_actuator_id;
+      var actuator_id = req.body.actuator_id;
       var method = req.body.method;
+      var data = req.body.data;
 
-      switch(method) {
-        case "on":
-          hue.lights_on(light_no, function(data){
-            res.send(data);
-          });
-          break;
+      databox_directory.get_my_registered_actuators(databox_directory.get_vendor_id(), (err, actuators) => {
+        if(err) {
+          console.log(err);
+          res.send(err);
+          return;
+        }
+        actuators = JSON.parse(actuators);
+
+        actuator = actuators.find((itm)=>{return itm.id == actuator_id});
+
+        if(actuator == 'undefined') {
+          console.log("Actuator not found!!!!");
+          res.send("Actuator not found!!!!");
+          return;
+        }
+
+        switch(actuator.actuator_type) {
+          case 'set-bulb-on':
+              console.log('set-bulb-on');
+              hue.lights_on(actuator.vendor_actuator_id, data, function(data){
+                res.send(data);
+              });
+            break;
+          case 'set-bulb-hue':
+            console.log('set-bulb-off');
+            hue.lights_hue(actuator.vendor_actuator_id, data, function(data){
+                res.send(data);
+              });
+            break;
+          case 'set-bulb-sat':
+            hue.lights_sat(actuator.vendor_actuator_id, data, function(data){
+                res.send(data);
+              });
+            break;
+          case 'set-bulb-bri':
+            hue.lights_bri(actuator.vendor_actuator_id, data, function(data){
+                res.send(data);
+              });
+            break;
+          case 'set-bulb-ct':
+            hue.lights_ct(actuator.vendor_actuator_id, data, function(data){
+                res.send(data);
+              });
+            break;
+          default:
+            console.log("Not implemented");
+            res.send("Not implemented");
+        }
         
-        case "off": 
-          hue.lights_off(light_no, function(data){
-            res.send(data);
-          });
-          break;
+      });
 
-      }
 });
 
 router.get('/list_lights', function(req, res, next) {

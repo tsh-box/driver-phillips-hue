@@ -8,58 +8,98 @@ var userfile = './hue/user.json'
 
 
 
+var clamp = function (x, lower, upper) {
+  return Math.min(upper, Math.max(lower, x));
+}
+/*bri(value)	Sets the brightness, where value from 0 to 255
+hue(value)	Sets the hue, where value from 0 to 65535
+sat(value)	Sets the saturation value from 0 to 255
+xy(x, y)	Sets the xy value where x and y is from 0 to 1 in the Philips Color co-ordinate system
+ct(colorTemperature)	Set the color temperature to a value between 153 and 500*/
 
-exports.lights_on = function(light_no, done) {
-
-  var displayResult = function(result) {
-    done(result);
-  };
-
-  var displayError = function(result) {
-    done(result);
-  };
+exports.lights_on = function(light_no, val, done) {
 
   jsonfile.readFile(userfile, function(err, obj) {
-    if(err)
-      res.send(err)
-    else{
+    if(err) {
+      done(err)
+    } else {
       api = new HueApi(obj.hostname, obj.hash);
       lightState = hue.lightState;
       state = lightState.create();
-      api.setLightState(light_no, state.on())
-      .then(displayResult)
-      .fail(displayError)
-      .done();
+      if(val == 'on' || val == true || val == 1) {
+        api.setLightState(light_no, state.on())
+        .then(() => {done("SUCCESS")})
+        .catch((err) => {done("FAIL" + err)});
+      } else {
+        api.setLightState(light_no, state.off())
+        .then(() => {done("SUCCESS")})
+        .catch((err) => {done("FAIL" + err)});
+      }
     }
   }); 
 
 };
 
-exports.lights_off = function(light_no, done) {
-  console.log(light_no);
-  var displayResult = function(result) {
-    done(result);
-  };
-
-  var displayError = function(result) {
-    done(result);
-  };
-
+exports.lights_bri = function(light_no, val, done) {
   jsonfile.readFile(userfile, function(err, obj) {
-    if(err)
-      res.send(err)
-    else{
+    if(err) {
+      done(err)
+    } else {
       api = new HueApi(obj.hostname, obj.hash);
       lightState = hue.lightState;
       state = lightState.create();
-      api.setLightState(light_no, state.off())
-      .then(displayResult)
-      .fail(displayError)
-      .done();
+      api.setLightState(light_no, state.bri(clamp(val,0,255)))
+      .then(() => {done("SUCCESS")})
+      .catch((err) => {done("FAIL" + err)});
     }
   }); 
-
 };
+
+exports.lights_hue = function(light_no, val, done) {
+  jsonfile.readFile(userfile, function(err, obj) {
+    if(err) {
+      done(err)
+    } else {
+      api = new HueApi(obj.hostname, obj.hash);
+      lightState = hue.lightState;
+      state = lightState.create();
+      api.setLightState(light_no, state.hue(clamp(val,0,65535)))
+      .then(() => {done("SUCCESS")})
+      .catch((err) => {done("FAIL" + err)});
+    }
+  }); 
+};
+
+exports.lights_sat = function(light_no, val, done) {
+  jsonfile.readFile(userfile, function(err, obj) {
+    if(err) {
+      done(err)
+    } else {
+      api = new HueApi(obj.hostname, obj.hash);
+      lightState = hue.lightState;
+      state = lightState.create();
+      api.setLightState(light_no, state.sat(clamp(val,0,255)))
+      .then(() => {done("SUCCESS")})
+      .catch((err) => {done("FAIL" + err)});
+    }
+  }); 
+};
+
+exports.lights_ct = function(light_no, val, done) {
+  jsonfile.readFile(userfile, function(err, obj) {
+    if(err) {
+      done(err)
+    } else {
+      api = new HueApi(obj.hostname, obj.hash);
+      lightState = hue.lightState;
+      state = lightState.create();
+      api.setLightState(light_no, state.bri(clamp(val,153,500)))
+      .then(() => {done("SUCCESS")})
+      .catch((err) => {done("FAIL" + err)});
+    }
+  }); 
+};
+
 
 exports.get_lights = function(done) {
 
@@ -119,6 +159,12 @@ exports.list_lights = function (vendor_id, driver_id, datastore_id, done) {
           databox_directory.register_sensor(driver_id, hue_id, datastore_id, vendor_id, lights[i].id, "hue", "hue", "current bulb hue", lights[i].name, function (err,data) { if(err) console.log("[ERROR]" + lights[i].id, data);});
         }
       });
+      databox_directory.register_sensor_type("bulb-bri", function(result) {
+        var hue_id = result.id;
+        for (var i in lights) {
+          databox_directory.register_sensor(driver_id, hue_id, datastore_id, vendor_id, lights[i].id, "brightness", "bri", "current bulb brightness", lights[i].name, function (err,data) { if(err) console.log("[ERROR]" + lights[i].id, data);});
+        }
+      });
       databox_directory.register_sensor_type("bulb-sat", function(result) {
         var sat_id = result.id;
         for (var i in lights) {
@@ -162,7 +208,7 @@ exports.list_lights = function (vendor_id, driver_id, datastore_id, done) {
           databox_directory.register_actuator(driver_id, on_id, vendor_id, 1, lights[i].id, "Change bulbs ct.", lights[i].name, function (err,data) { if(err) console.log("[ERROR]" + lights[i].id, data);});
         }
       });
-          
+      done(null,{});    
     })
     .fail((err) => {
       console.log("failed");
