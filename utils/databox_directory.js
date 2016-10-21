@@ -1,13 +1,20 @@
 var request = require('request');
 
+
+var vendor_id = null;
+var driver_id = null;
+
+exports.get_vendor_id = function() { return vendor_id};
+exports.get_driver_id = function() { return driver_id};
+
 var databox_directory_url = process.env.DATABOX_DIRECTORY_ENDPOINT;
 
 // register datastore with directory will retry if directory is not ready 
 var register_driver = function(vendorName,driverName,driverDescription) {
   return new Promise((resolve, reject) => {
     
-    var vendor_id = null;
-    var driver_id = null;
+    vendor_id = null;
+    driver_id = null;
 
     console.log("Registering vendor:: " + vendorName + " ....");
 
@@ -186,6 +193,20 @@ exports.get_my_registered_sensors = function(vendor_id, done) {
 	});
 }
 
+exports.get_my_registered_actuators = function(vendor_id, done) {
+	var options = {
+  		uri: databox_directory_url+'/vendor/'+vendor_id+'/actuator',
+  		method: 'GET',
+	};
+
+	request(options, function (error, response, body) {
+  		if (error) {
+    	 return done(error,null);
+  		}
+  		return done(null,body);
+	});
+}
+
 exports.get_datastore_id = function(hostname, done) {
   
   return new Promise((resolve, reject) => {
@@ -223,9 +244,5 @@ exports.get_registered_sensor_types = function(done) { // takes in
 }
 
 exports.get_registered_actuator_types = function(done) { // takes in 
-
-}
-
-exports.get_my_registered_actuators = function(vendor_id, done) {
 
 }
