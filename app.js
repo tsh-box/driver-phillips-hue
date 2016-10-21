@@ -5,6 +5,9 @@ var bodyParser = require('body-parser');
 var databox_directory = require('./utils/databox_directory.js');
 var hue = require('./hue/hue.js');
 var timer = require('timers');
+var request = require('request');
+
+var DATASTORE_TIMESERIES_ENDPOINT = process.env.DATASTORE_TIMESERIES_ENDPOINT;
 
 var api = require('./routes/api');
 var config = require('./routes/config');
@@ -103,22 +106,6 @@ var vendor_id;
 var driver_id;
 var datastore_id;
 
-//TODO FIX THIS BAD THINGS HAPPEN IF databox_directory is not available !!!
-/*databox_directory.register_vendor("Phillips", function(data) {
-  vendor_id = data.id;
-  databox_directory.register_driver("databox-driver-phillipshue", "amazing phillips hue actuating and sensing driver", vendor_id, function(data2) {
-    driver_id = data2.id;
-    console.log(data2);
-
-    //register the bulbs as sensors and actuators
-    hue.list_lights(function (done){
-      databox_directory.get_my_registered_sensors(vendor_id, function (result) {
-        console.log(result);
-      });
-    });
-  });
-});*/
-
 databox_directory.register_driver('Phillips','databox-driver-phillipshue', 'An amazing phillips hue actuating and sensing driver')
 .then((ids) => {
   console.log(ids);
@@ -140,26 +127,49 @@ databox_directory.register_driver('Phillips','databox-driver-phillipshue', 'An a
     });
   });
 })
-.catch((err) => {console.log("[Error]" + err)});
-
-//TDOO: re-enable
-/*var data_poster = function(foo) {
+.then(() => {
+  //poll hue bridge for data
+  var data_poster = function(foo) {
     hue.get_lights(function(lights) {
-      for (var i in lights){
-        console.log(lights[i]);
-      }
       databox_directory.get_my_registered_sensors(vendor_id, function (result) {
-        console.log(result);
+        
+        var lights_by_vendor_sensor_id = [];
+        for (var i in lights){
+          lights_by_vendor_sensor_id[lights[i].id] = lights[i];
+        }
+        console.log("lights_by_vendor_sensor_id",lights_by_vendor_sensor_id);
+        
+        sensors = JSON.parse(result);
+        for(sensor of sensors) {
+          var light = lights_by_vendor_sensor_id[sensor.vendor_sensor_id];
+          var val = light['state'][sensor.short_unit];
+          console.log(sensor.short_unit + " = " + val);
+          saveReading(sensor.id,vendor_id,val);
+        }
       });
     });     
   
-};
-timer.setInterval(data_poster, 10000);*/
-
-
+  };
+  timer.setInterval(data_poster, 10000);
+})
+.catch((err) => {console.log("[Error]" + err)});
 
 server.listen(PORT, function(){
     console.log("Server listening on: http://localhost:%s", PORT);
 });
 
 module.exports = app;
+
+function saveReading(s_id,v_id,reading) {
+      var options = {
+          uri: DATASTORE_TIMESERIES_ENDPOINT + '/reading',
+          method: 'POST',
+          json: 
+          {
+            sensor_id: s_id, 
+            vendor_id: v_id, 
+            value: reading   
+          }
+      };
+      request.post(options, (error, response, body) => {console.log(error, body)});
+    }
