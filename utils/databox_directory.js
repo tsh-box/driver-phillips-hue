@@ -86,7 +86,7 @@ exports.register_sensor_type = function(description, done) { // requires a descr
 }
 
 exports.register_sensor = function(driver_id, sensor_type_id, datastore_id, vendor_id, vendor_sensor_id, unit, short_unit, description, location, done) {
-	var options = {
+  var options = {
   		uri: databox_directory_url+'/sensor/register',
   		method: 'POST',
   		json: 
@@ -104,10 +104,10 @@ exports.register_sensor = function(driver_id, sensor_type_id, datastore_id, vend
 	};
 
 	request(options, function (error, response, body) {
-  		if (!error && response.statusCode == 200) {
-    	 return done(body);
+  		if (error) {
+    	 return done(error,{});
   		}
-  		return done(error);
+  		return done(null,body);
 	});
 }
 
@@ -163,12 +163,12 @@ exports.register_actuator = function(driver_id, actuator_type_id, vendor_id,  co
             "location" : location	
   		}
 	};
-
+  console.log("register_actuator",options);
 	request(options, function (error, response, body) {
-  		if (!error && response.statusCode == 200) {
-    	 return done(body);
+  		if (error) {
+    	 return done(error,null);
   		}
-  		return done(error);
+  		return done(null,body);
 	});
 }
 
