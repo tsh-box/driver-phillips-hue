@@ -7,7 +7,7 @@ var hue = require('./hue/hue.js');
 var timer = require('timers');
 var request = require('request');
 
-var DATABOX_STORE_BLOB_ENDPOINT = process.env.DATASTORE_TIMESERIES_ENDPOINT;
+var DATABOX_STORE_BLOB_ENDPOINT = process.env.DATABOX_STORE_BLOB_ENDPOINT;
 
 var api = require('./routes/api');
 var config = require('./routes/config');
@@ -161,7 +161,7 @@ server.listen(PORT, function(){
 
 module.exports = app;
 
-function saveReading(s_id,v_id,reading) {
+function saveReading(s_id,v_id,data) {
       var options = {
           uri: DATABOX_STORE_BLOB_ENDPOINT + '/data',
           method: 'POST',
@@ -169,7 +169,7 @@ function saveReading(s_id,v_id,reading) {
           {
             sensor_id: s_id, 
             vendor_id: v_id, 
-            value: reading   
+            data: data   
           }
       };
       request.post(options, (error, response, body) => {console.log(error, body)});
