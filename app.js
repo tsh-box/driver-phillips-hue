@@ -7,7 +7,7 @@ var hue = require('./hue/hue.js');
 var timer = require('timers');
 var request = require('request');
 
-var DATASTORE_TIMESERIES_ENDPOINT = process.env.DATASTORE_TIMESERIES_ENDPOINT;
+var DATABOX_STORE_BLOB_ENDPOINT = process.env.DATASTORE_TIMESERIES_ENDPOINT;
 
 var api = require('./routes/api');
 var config = require('./routes/config');
@@ -163,7 +163,7 @@ module.exports = app;
 
 function saveReading(s_id,v_id,reading) {
       var options = {
-          uri: DATASTORE_TIMESERIES_ENDPOINT + '/reading',
+          uri: DATABOX_STORE_BLOB_ENDPOINT + '/data',
           method: 'POST',
           json: 
           {
