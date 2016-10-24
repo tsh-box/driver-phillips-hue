@@ -113,7 +113,7 @@ databox_directory.register_driver('Phillips','databox-driver-phillipshue', 'An a
   vendor_id = ids['vendor_id'];
   driver_id = ids['driver_id'];
 
-  return databox_directory.get_datastore_id('databox-store-blob');;
+  return databox_directory.get_datastore_id('databox-store-blob');
 })
 .then((storeid) => {
   datastore_id = storeid;
