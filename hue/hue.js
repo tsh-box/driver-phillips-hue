@@ -184,35 +184,35 @@ exports.list_lights = function (vendor_id, driver_id, datastore_id, done) {
         console.log("FIRST actuator TYPE ", id);
         for (var i in lights) {
           console.log("REGISTERING actuator", i);
-          databox_directory.register_actuator(driver_id, id, vendor_id, 1, lights[i].id, "Switch bulb on or off", lights[i].name, function (err,data) { if(err) console.log("[ERROR]" + lights[i].id, data);});
+          databox_directory.register_actuator(driver_id, id, vendor_id, datastore_id, lights[i].id, "Switch bulb on or off", lights[i].name, function (err,data) { if(err) console.log("[ERROR]" + lights[i].id, data);});
         }
       });
 
       databox_directory.register_actuator_type("set-bulb-bri", function(result) {
         on_id = result.id;
         for (var i in lights) {
-          databox_directory.register_actuator(driver_id, on_id, vendor_id, 1, lights[i].id, "Change bulbs brightness", lights[i].name, function (err,data) { if(err) console.log("[ERROR]" + lights[i].id, data);});
+          databox_directory.register_actuator(driver_id, on_id, vendor_id, datastore_id, lights[i].id, "Change bulbs brightness", lights[i].name, function (err,data) { if(err) console.log("[ERROR]" + lights[i].id, data);});
         }
       });
 
       databox_directory.register_actuator_type("set-bulb-hue", function(result) {
         on_id = result.id;
         for (var i in lights) {
-          databox_directory.register_actuator(driver_id, on_id, vendor_id, 1, lights[i].id, "Change bulbs hue", lights[i].name, function (err,data) { if(err) console.log("[ERROR]" + lights[i].id, data);});
+          databox_directory.register_actuator(driver_id, on_id, vendor_id, datastore_id, lights[i].id, "Change bulbs hue", lights[i].name, function (err,data) { if(err) console.log("[ERROR]" + lights[i].id, data);});
         }
       });
 
       databox_directory.register_actuator_type("set-bulb-sat", function(result) {
         on_id = result.id;
         for (var i in lights) {
-          databox_directory.register_actuator(driver_id, on_id, vendor_id, 1, lights[i].id, "Change bulbs saturation", lights[i].name, function (err,data) { if(err) console.log("[ERROR]" + lights[i].id, data);});
+          databox_directory.register_actuator(driver_id, on_id, vendor_id, datastore_id, lights[i].id, "Change bulbs saturation", lights[i].name, function (err,data) { if(err) console.log("[ERROR]" + lights[i].id, data);});
         }
       });
 
       databox_directory.register_actuator_type("set-bulb-ct", function(result) {
         on_id = result.id;
         for (var i in lights) {
-          databox_directory.register_actuator(driver_id, on_id, vendor_id, 1, lights[i].id, "Change bulbs ct.", lights[i].name, function (err,data) { if(err) console.log("[ERROR]" + lights[i].id, data);});
+          databox_directory.register_actuator(driver_id, on_id, vendor_id, datastore_id, lights[i].id, "Change bulbs ct.", lights[i].name, function (err,data) { if(err) console.log("[ERROR]" + lights[i].id, data);});
         }
       });
       done(null,{});    
