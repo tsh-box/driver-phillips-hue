@@ -34,13 +34,11 @@ router.post('/actuate', function(req, res, next) {
 
         switch(actuator.actuator_type) {
           case 'set-bulb-on':
-              console.log('set-bulb-on');
               hue.lights_on(actuator.vendor_actuator_id, data, function(data){
                 res.send(data);
               });
             break;
           case 'set-bulb-hue':
-            console.log('set-bulb-off');
             hue.lights_hue(actuator.vendor_actuator_id, data, function(data){
                 res.send(data);
               });

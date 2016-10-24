@@ -188,6 +188,13 @@ exports.list_lights = function (vendor_id, driver_id, datastore_id, done) {
         }
       });
 
+      databox_directory.register_actuator_type("set-bulb-bri", function(result) {
+        on_id = result.id;
+        for (var i in lights) {
+          databox_directory.register_actuator(driver_id, on_id, vendor_id, 1, lights[i].id, "Change bulbs brightness", lights[i].name, function (err,data) { if(err) console.log("[ERROR]" + lights[i].id, data);});
+        }
+      });
+
       databox_directory.register_actuator_type("set-bulb-hue", function(result) {
         on_id = result.id;
         for (var i in lights) {

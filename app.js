@@ -35,6 +35,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/api', api);
 app.use('/', config);
 app.use('/status', status);
+app.use('/ui', express.static('./static'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
