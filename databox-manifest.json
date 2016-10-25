@@ -14,10 +14,10 @@
 		"sensors"
 	],
 
-	"homepage": "https://github.com/me-box/vendor-philipshue",
+	"homepage": "https://github.com/me-box/databox-driver-phillipshue",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/me-box/vendor-philipshue.git"
+		"url": "git+https://github.com/me-box/databox-driver-phillipshue.git"
 	},
 
 	"network-permissions": [
