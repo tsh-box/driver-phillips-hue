@@ -1,5 +1,12 @@
-FROM node:4-onbuild
+FROM node:alpine
+
+ADD package.json package.json
+RUN npm install && npm run clean
+
+ADD . .
 
 LABEL databox.type="driver"
 
 EXPOSE 8080
+
+CMD ["npm","start"]
