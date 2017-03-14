@@ -20,10 +20,6 @@
 		"url": "git+https://github.com/me-box/databox-driver-phillipshue.git"
 	},
 
-	"network-permissions": [
-	],
-	"hardware-permissions": [
-	],
 
 	"resource-requirements": {
     "store":"databox-store-blob"
