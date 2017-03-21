@@ -1,10 +1,9 @@
 
 var hue = require("node-hue-api");
 var HueApi = require("node-hue-api").HueApi;
-var jsonfile = require('jsonfile')
-var databox_directory = require('./../utils/databox_directory.js');
+var settingsManager = require('../settings.js')
+//var databox_directory = require('./../utils/databox_directory.js');
  
-var userfile = './hue/user.json'
 
 
 
@@ -126,7 +125,7 @@ exports.get_lights = function(done) {
 
 }
 
-exports.list_lights = function (vendor_id, driver_id, datastore_id, done) {
+/*exports.list_lights = function (vendor_id, driver_id, datastore_id, done) {
 
   console.log("list_lights:: ", vendor_id, driver_id, datastore_id);
 
@@ -225,7 +224,7 @@ exports.list_lights = function (vendor_id, driver_id, datastore_id, done) {
 
   });
 
-}
+}*/
 
 
 exports.setup = function(done) {
@@ -269,29 +268,24 @@ exports.setup = function(done) {
 };
 
 
-exports.fudge = function(hostname, done) {
+exports.findHub = function(hostname) {
+  console.log("[HUE.findHub]", hostname);
+  return new Promise((resolve, reject)=>{
+    var user;
+    var hue2 = new HueApi();
 
-  var user;
-  var hue2 = new HueApi();
-
-  var success_result = function(result) {
-    var user_object = {user: "databox", hash: result, "hostname": hostname};
-    jsonfile.writeFile(userfile, user_object, function (err) {
-      console.error(err)
+    hue2.registerUser(hostname, "databox")
+    .then((res)=>{
+      var user_object = {user: "databox", hash: result, "hostname": hostname};
+      settingsManager.setSettings(user_object)
+        .then((settings)=>{
+          resolve(settings);
+        });
     })
-    this.list_lights(function (complete) {
-      done(user_object);
+    .catch((err)=>{
+      reject(err);
     });
-    
-  };
 
-  var fail_result = function(result) {
-    done(result);
-  };
-
-  hue2.registerUser(hostname, "databox")
-  .then(success_result)
-  .fail(fail_result)
-  .done();
+  });
      
 };

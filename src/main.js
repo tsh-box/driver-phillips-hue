@@ -1,27 +1,29 @@
 /*jshint esversion: 6 */
-var express = require('express');
-var path = require('path');
-var logger = require('morgan');
-var bodyParser = require('body-parser');
-var hue = require('./hue/hue.js');
-var timer = require('timers');
+const express = require('express');
+const path = require('path');
+const bodyParser = require('body-parser');
+const hue = require('./hue/hue.js');
+const databox = require('node-databox');
+const settingsManger = require('./settings.js');
 
-var databox = require('node-databox');
+const DATABOX_STORE_BLOB_ENDPOINT = process.env.DATABOX_DRIVER_PHILLIPSHUE_DATABOX_STORE_BLOB_ENDPOINT;
+const HTTPS_SERVER_CERT = process.env.HTTPS_SERVER_CERT || '';
+const HTTPS_SERVER_PRIVATE_KEY = process.env.HTTPS_SERVER_PRIVATE_KEY || '';
+const credentials = {
+	key:  HTTPS_SERVER_PRIVATE_KEY,
+	cert: HTTPS_SERVER_CERT,
+};
+const PORT = process.env.port || '8080';
 
-var DATABOX_STORE_BLOB_ENDPOINT = process.env.DATABOX_DRIVER_PHILIPSHUE_DATABOX_STORE_BLOB_ENDPOINT;
 
-var api = require('./routes/api');
-var config = require('./routes/config');
-var status = require('./routes/status');
 
-var app = express();
+const api = require('./routes/api');
+const config = require('./routes/config');
+const status = require('./routes/status');
 
-var debug = require('debug')('driver_phillipshue:server');
-var http = require('http');
+const app = express();
 
-// get port from env or 3000
-const PORT = 8080;
-app.set('port', PORT);
+const https = require('https');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -29,84 +31,16 @@ app.set('view engine', 'jade');
 
 
 // app setup
-app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use('/api', api);
-app.use('/', config);
 app.use('/status', status);
-app.use('/ui', express.static('./static'));
+app.use('/ui', config);
+app.use('/ui/api', api);
+//app.use('/ui', express.static('./static'));
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
+https.createServer(credentials, app).listen(PORT);
 
-// error handlers for app 
-
-// development error handler
-if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render('error', {
-      message: err.message,
-      error: err
-    });
-  });
-}
-
-// production error handler
-app.use(function(err, req, res, next) {
-  res.status(err.status || 500);
-  res.render('error', {
-    message: err.message,
-    error: {}
-  });
-});
-
-var server = http.createServer(app);
-
-function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
-}
-
-function onError(error) {
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
-
-  //var bind = typeof port === 'string'
-  //  ? 'Pipe ' + port
-  ///  : 'Port ' + port;
-
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-      console.error(' requires elevated privileges');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      console.error('port is already in use');
-      process.exit(1);
-      break;
-    default:
-      throw error;
-  }
-}
-
-server.on('error', onError);
-server.on('listening', onListening);
-
-server.listen(PORT, function(){
-    console.log("Server listening on: http://localhost:%s", PORT);
-});
 module.exports = app;
 
 
@@ -115,22 +49,40 @@ var userConfigFile = './hue/user.json';
 var registeredLights = {} //keep track of which lights have been registered as datasources
 var vendor = "Philips Hue";
 
+console.log("TOSH::",DATABOX_STORE_BLOB_ENDPOINT)
+
 databox.waitForStoreStatus(DATABOX_STORE_BLOB_ENDPOINT,'active',10)
   .then(()=>{
+    return databox.catalog.registerDatasource(
+              DATABOX_STORE_BLOB_ENDPOINT, {
+              description: 'Philips hue driver settings',
+              contentType: 'text/json',
+              vendor: 'Databox Inc.',
+              type: 'philipsHueSettings',
+              datasourceid: 'philipsHueSettings',
+              storeType: 'databox-store-blob',
+            })
+  })
+  .then(()=>{
 
-    var waitForConfig = function() {
-      jsonfile.readFile(userConfigFile, function(err, obj) {
-        if(err) {
-          console.log("[waitForConfig] waiting for user configuration");
-          setTimeout(waitForConfig,1000);
-        } else {
-          resolve(new HueApi(obj.hostname, obj.hash));
-        }
-      });
-    };
+    return new Promise((resolve,reject)=>{
+      var waitForConfig = function() {
 
-    waitForConfig();
+        settingsManger.getSettings()
+          .then((settings)=>{
+            console.log("[SETTINGS] retrived", settings)
+            resolve(new HueApi(settings.hostname, settings.hash));
+          })
+          .catch((err)=>{
+            console.log("[waitForConfig] waiting for user configuration");
+            setTimeout(waitForConfig,5000);
+          });
 
+      };
+
+      waitForConfig();
+    });
+    
   })
   .then((hueApi)=>{
     

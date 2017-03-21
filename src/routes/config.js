@@ -4,28 +4,25 @@ var router = express.Router();
 var hue = require('./../hue/hue.js');
 
 router.get('/', function(req, res, next) {
-/*
-  hue.setup(function(data){
-    res.send(data);
-  });
-*/
-	res.render('config', {});
-});
-
-router.get('/foo', function(req, res, next) {
-
-  hue.setup(function(data){
-    res.send(data);
-  });
-
+	console.log("res.render('config', {})");
+  res.render('config', {});
 });
 
 router.post('/', function (req, res) {
     var ip_address = (req.body.title);
+
     console.log(req.body.title);
-    hue.fudge(ip_address, function(data){
-   		res.send(data);
-  	});
+
+    hue.findHub(ip_address)
+    .then((data)=>{
+       console.log("[TOSH] It Works");
+       res.send(data);
+    })
+    .catch((err)=>{
+       console.log("[TOSH] It Works");
+       res.status(401).send("Failed to find hue bridge at " + ip_address);
+    });
+
 });
 
 module.exports = router;

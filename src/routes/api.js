@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 var hue = require('./../hue/hue.js');
-var databox_directory = require('./../utils/databox_directory.js');
+//var databox_directory = require('./../utils/databox_directory.js');
 
  
 
@@ -16,7 +16,7 @@ router.post('/actuate', function(req, res, next) {
       var method = req.body.method;
       var data = req.body.data;
 
-      databox_directory.get_my_registered_actuators(databox_directory.get_vendor_id(), (err, actuators) => {
+      /*databox_directory.get_my_registered_actuators(databox_directory.get_vendor_id(), (err, actuators) => {
         if(err) {
           console.log(err);
           res.send(err);
@@ -63,15 +63,15 @@ router.post('/actuate', function(req, res, next) {
             res.send("Not implemented");
         }
         
-      });
+      });*/
 
 });
 
-router.get('/list_lights', function(req, res, next) {
+/*router.get('/list_lights', function(req, res, next) {
   hue.list_lights(function(data) {
     res.send(data);
   });
-});
+});*/
 
 
 router.get('/setup', function(req, res, next) {
