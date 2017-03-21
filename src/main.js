@@ -1,13 +1,14 @@
+/*jshint esversion: 6 */
 var express = require('express');
 var path = require('path');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
-var databox_directory = require('./utils/databox_directory.js');
 var hue = require('./hue/hue.js');
 var timer = require('timers');
-var request = require('request');
 
-var DATABOX_STORE_BLOB_ENDPOINT = process.env.DATABOX_STORE_BLOB_ENDPOINT;
+var databox = require('node-databox');
+
+var DATABOX_STORE_BLOB_ENDPOINT = process.env.DATABOX_DRIVER_PHILIPSHUE_DATABOX_STORE_BLOB_ENDPOINT;
 
 var api = require('./routes/api');
 var config = require('./routes/config');
@@ -103,74 +104,160 @@ function onError(error) {
 server.on('error', onError);
 server.on('listening', onListening);
 
-var vendor_id;
-var driver_id;
-var datastore_id;
-
-databox_directory.register_driver('Phillips','databox-driver-phillipshue', 'An amazing phillips hue actuating and sensing driver')
-.then((ids) => {
-  console.log(ids);
-  vendor_id = ids['vendor_id'];
-  driver_id = ids['driver_id'];
-
-  return databox_directory.get_datastore_id('databox-store-blob');
-})
-.then((storeid) => {
-  datastore_id = storeid;
-
-  return new Promise((resolve, reject) => {
-    hue.list_lights(vendor_id, driver_id, datastore_id, function (err,data){  
-      if(err) {
-        reject("Can't register sensors");
-        return;
-      }
-      resolve();
-    });
-  });
-})
-.then(() => {
-  //poll hue bridge for data
-  var data_poster = function(foo) {
-    hue.get_lights(function(lights) {
-      databox_directory.get_my_registered_sensors(vendor_id, function (result) {
-        
-        var lights_by_vendor_sensor_id = [];
-        for (var i in lights){
-          lights_by_vendor_sensor_id[lights[i].id] = lights[i];
-        }
-        console.log("lights_by_vendor_sensor_id",lights_by_vendor_sensor_id);
-        
-        sensors = JSON.parse(result);
-        for(sensor of sensors) {
-          var light = lights_by_vendor_sensor_id[sensor.vendor_sensor_id];
-          var val = light['state'][sensor.short_unit];
-          console.log(sensor.short_unit + " = " + val);
-          saveReading(sensor.id,vendor_id,val);
-        }
-      });
-    });     
-  
-  };
-  timer.setInterval(data_poster, 10000);
-})
-.catch((err) => {console.log("[Error]" + err)});
-
 server.listen(PORT, function(){
     console.log("Server listening on: http://localhost:%s", PORT);
 });
-
 module.exports = app;
 
-function saveReading(s_id,v_id,data) {
-      var options = {
-          uri: DATABOX_STORE_BLOB_ENDPOINT + '/data',
-          method: 'POST',
-          json: 
-          {
-            sensor_id: s_id, 
-            vendor_id: v_id, 
-            data: data   
-          }
-      };
-      request.post(options, (error, response, body) => {console.log(error, body)});
-    }
+
+var HueApi = require("node-hue-api").HueApi;
+var userConfigFile = './hue/user.json';
+var registeredLights = {} //keep track of which lights have been registered as datasources
+var vendor = "Philips Hue";
+
+databox.waitForStoreStatus(DATABOX_STORE_BLOB_ENDPOINT,'active',10)
+  .then(()=>{
+
+    var waitForConfig = function() {
+      jsonfile.readFile(userConfigFile, function(err, obj) {
+        if(err) {
+          console.log("[waitForConfig] waiting for user configuration");
+          setTimeout(waitForConfig,1000);
+        } else {
+          resolve(new HueApi(obj.hostname, obj.hash));
+        }
+      });
+    };
+
+    waitForConfig();
+
+  })
+  .then((hueApi)=>{
+    
+    var infinitePoll = function() {
+
+        hueApi.lights()
+        .then((lights)=>{
+           //Update available datasources  
+           for(var light of lights) {
+              
+              if( !(light.name in registeredLights)) {
+                //new light found 
+                console.log("[NEW BULB FOUND] " + light.id + " " + light.name);
+                registeredLights[light.id] = light.id;
+
+                //register datasources
+                databox.catalog.registerDatasource({
+                  description: light.name + ' on off state.',
+                  contentType: 'text/json',
+                  vendor: vendor,
+                  type: 'bulb-on',
+                  datasourceid: 'bulb-on-' + light.id,
+                  storeType: 'databox-store-blob'
+                });
+                databox.catalog.registerDatasource({
+                  description: light.name + ' hue value.',
+                  contentType: 'text/json',
+                  vendor: vendor,
+                  type: 'bulb-hue',
+                  datasourceid: 'bulb-hue-' + light.id,
+                  storeType: 'databox-store-blob'
+                });
+                databox.catalog.registerDatasource({
+                  description: light.name + ' brightness value.',
+                  contentType: 'text/json',
+                  vendor: vendor,
+                  type: 'bulb-bri',
+                  datasourceid: 'bulb-bri-' + light.id,
+                  storeType: 'databox-store-blob'
+                });
+                databox.catalog.registerDatasource({
+                  description: light.name + ' saturation value.',
+                  contentType: 'text/json',
+                  vendor: vendor,
+                  type: 'bulb-sat',
+                  datasourceid: 'bulb-sat-' + light.id,
+                  storeType: 'databox-store-blob'
+                });
+                databox.catalog.registerDatasource({
+                  description: light.name + ' color temperature value.',
+                  contentType: 'text/json',
+                  vendor: vendor,
+                  type: 'bulb-ct',
+                  datasourceid: 'bulb-ct' + light.id,
+                  storeType: 'databox-store-blob'
+                });
+
+                //register actuators 
+                databox.catalog.registerDatasource({
+                  description: 'Set ' + light.name + ' bulbs on off state.',
+                  contentType: 'text/json',
+                  vendor: vendor,
+                  type: 'set-bulb-on',
+                  datasourceid: 'set-bulb-on-' + light.id,
+                  storeType: 'databox-store-blob',
+                  isActuator:true
+                });
+                databox.catalog.registerDatasource({
+                  description: 'Set ' + light.name + ' hue value.',
+                  contentType: 'text/json',
+                  vendor: vendor,
+                  type: 'set-bulb-hue',
+                  datasourceid: 'set-bulb-hue-' + light.id,
+                  storeType: 'databox-store-blob',
+                  isActuator:true
+                });
+                databox.catalog.registerDatasource({
+                  description:'Set ' + light.name + ' brightness value.',
+                  contentType: 'text/json',
+                  vendor: vendor,
+                  type: 'set-bulb-bri',
+                  datasourceid: 'set-bulb-bri-' + light.id,
+                  storeType: 'databox-store-blob',
+                  isActuator:true
+                });
+                databox.catalog.registerDatasource({
+                  description: 'Set ' + light.name + ' saturation value.',
+                  contentType: 'text/json',
+                  vendor: vendor,
+                  type: 'set-bulb-sat',
+                  datasourceid: 'set-bulb-sat-' + light.id,
+                  storeType: 'databox-store-blob',
+                  isActuator:true
+                });
+                databox.catalog.registerDatasource({
+                  description: 'Set ' + light.name + ' color temperature value.',
+                  contentType: 'text/json',
+                  vendor: vendor,
+                  type: 'set-bulb-ct',
+                  datasourceid: 'set-bulb-ct' + light.id,
+                  storeType: 'databox-store-blob',
+                  isActuator:true
+                });
+
+              } else {
+
+                //Update bulb state bulb-on-
+                databox.timeseries.write(DATABOX_STORE_BLOB_ENDPOINT, 'bulb-on-'  + light.id, light.state.on);
+                databox.timeseries.write(DATABOX_STORE_BLOB_ENDPOINT, 'bulb-hue-' + light.id, light.state.hue);
+                databox.timeseries.write(DATABOX_STORE_BLOB_ENDPOINT, 'bulb-bri-' + light.id, light.state.bri);
+                databox.timeseries.write(DATABOX_STORE_BLOB_ENDPOINT, 'bulb-sat-' + light.id, light.state.sat);
+                databox.timeseries.write(DATABOX_STORE_BLOB_ENDPOINT, 'bulb-ct-'  + light.id, light.state.ct);
+
+              }
+           }
+        })
+        .catch((error)=>{
+          console.log("[ERROR]", error);
+        });
+
+        
+        setTimeout(infinitePoll,5000);
+    };
+
+    infinitePoll();
+
+  })
+  .catch((error)=>{
+    console.log("[ERROR]",error);
+  });
