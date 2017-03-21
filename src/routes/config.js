@@ -15,12 +15,10 @@ router.post('/', function (req, res) {
 
     hue.findHub(ip_address)
     .then((data)=>{
-       console.log("[TOSH] It Works");
        res.send(data);
     })
     .catch((err)=>{
-       console.log("[TOSH] It Works");
-       res.status(401).send("Failed to find hue bridge at " + ip_address);
+       res.status(401).send("Failed to find hue bridge at " + ip_address + "<b>" + err + "</b>");
     });
 
 });
