@@ -106,7 +106,7 @@ databox.waitForStoreStatus(DATABOX_STORE_BLOB_ENDPOINT,'active',10)
         hueApi.lights()
         .then((lights)=>{
            //Update available datasources  
-            lights.lights.foreach((light)=>{
+            lights.lights.forEach((light)=>{
 
               if( !(light.id in registeredLights)) {
                 //new light found 
@@ -234,7 +234,7 @@ databox.waitForStoreStatus(DATABOX_STORE_BLOB_ENDPOINT,'active',10)
                 databox.timeseries.write(DATABOX_STORE_BLOB_ENDPOINT, 'bulb-ct-'  + light.id, light.state.ct);
 
               }
-              
+
           });
            
         })
