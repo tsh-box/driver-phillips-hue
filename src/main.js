@@ -83,9 +83,6 @@ databox.waitForStoreStatus(DATABOX_STORE_BLOB_ENDPOINT,'active',10)
     
     //Deal with actuation events
     databox.subscriptions.connect(DATABOX_STORE_BLOB_ENDPOINT)
-    .catch((err)=>{
-      console.log("[Actuation connect error]",err);
-    })
     .then((actuationEmitter)=>{
       actuationEmitter.on('data',(endpointHost, actuatorId, data)=>{
         console.log("[Actuation] data received",endpointHost, actuatorId, data);
@@ -96,6 +93,9 @@ databox.waitForStoreStatus(DATABOX_STORE_BLOB_ENDPOINT,'active',10)
 
         hue.setLights(hueId,hueType,data);
 
+      })
+      .catch((err)=>{
+        console.log("[Actuation connect error]",err);
       });
     });
 
@@ -106,8 +106,8 @@ databox.waitForStoreStatus(DATABOX_STORE_BLOB_ENDPOINT,'active',10)
         hueApi.lights()
         .then((lights)=>{
            //Update available datasources  
-           for(var light of lights.lights) {
-              
+            lights.lights.foreach((light)=>{
+
               if( !(light.id in registeredLights)) {
                 //new light found 
                 console.log("[NEW BULB FOUND] " + light.id + " " + light.name);
@@ -223,7 +223,7 @@ databox.waitForStoreStatus(DATABOX_STORE_BLOB_ENDPOINT,'active',10)
                 .then(()=>{
                   databox.subscriptions.subscribe(DATABOX_STORE_BLOB_ENDPOINT,'set-bulb-ct-' + light.id,'ts');
                 });
-
+              
               } else {
 
                 //Update bulb state
@@ -234,7 +234,9 @@ databox.waitForStoreStatus(DATABOX_STORE_BLOB_ENDPOINT,'active',10)
                 databox.timeseries.write(DATABOX_STORE_BLOB_ENDPOINT, 'bulb-ct-'  + light.id, light.state.ct);
 
               }
-           }
+              
+          });
+           
         })
         .catch((error)=>{
           console.log("[ERROR]", error);
