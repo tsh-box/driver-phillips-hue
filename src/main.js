@@ -91,7 +91,7 @@ databox.waitForStoreStatus(DATABOX_STORE_BLOB_ENDPOINT,'active',10)
         const hueType = tmp[2];
         const hueId = tmp[3];
 
-        hue.setLights(hueId,hueType,data);
+        hue.setLights(hueId,hueType,data.data);
 
       })
       .catch((err)=>{
