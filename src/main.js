@@ -5,14 +5,15 @@ const bodyParser = require('body-parser');
 const hue = require('./hue/hue.js');
 const databox = require('node-databox');
 const settingsManager = require('./settings.js');
+const fs = require('fs')
 
-const DATABOX_STORE_BLOB_ENDPOINT = process.env.DATABOX_DRIVER_PHILLIPSHUE_DATABOX_STORE_BLOB_ENDPOINT;
-const HTTPS_SERVER_CERT = process.env.HTTPS_SERVER_CERT || '';
-const HTTPS_SERVER_PRIVATE_KEY = process.env.HTTPS_SERVER_PRIVATE_KEY || '';
-const credentials = {
-	key:  HTTPS_SERVER_PRIVATE_KEY,
-	cert: HTTPS_SERVER_CERT,
-};
+const DATABOX_STORE_BLOB_ENDPOINT = process.env.DATABOX_STORE_ENDPOINT;
+
+const HTTPS_SECRETS = JSON.parse( fs.readFileSync("/run/secrets/DATABOX_PEM") );
+var credentials = {
+  key:  HTTPS_SECRETS.clientprivate || '',
+  cert: HTTPS_SECRETS.clientcert || '',
+};		
 const PORT = process.env.port || '8080';
 
 const config = require('./routes/config');

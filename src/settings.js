@@ -1,7 +1,7 @@
 
 var databox = require('node-databox');
 
-var endpoint = process.env.DATABOX_DRIVER_PHILLIPSHUE_DATABOX_STORE_BLOB_ENDPOINT;
+var endpoint = process.env.DATABOX_STORE_ENDPOINT;
 var datasourceid = 'philipsHueSettings';
 
 var settingsCache = null;
