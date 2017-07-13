@@ -1,7 +1,7 @@
 {
 	"manifest-version": 1,
 
-	"name": "databox-driver-phillipshue",
+	"name": "driver-phillips-hue",
 	"version": "0.1.0",
 
 	"description": "A Databox driver for the phillips hue lights",
@@ -14,14 +14,13 @@
 		"sensors"
 	],
 
-	"homepage": "https://github.com/me-box/databox-driver-phillipshue",
+	"homepage": "https://github.com/me-box/driver-phillips-hue",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/me-box/databox-driver-phillipshue.git"
+		"url": "git+https://github.com/me-box/driver-phillips-hue.git"
 	},
 
 
 	"resource-requirements": {
-    "store":"databox-store-blob"
-	}
+    "store":"store-jsonß"}
 }
