@@ -9,11 +9,8 @@ const fs = require('fs')
 
 const DATABOX_STORE_BLOB_ENDPOINT = process.env.DATABOX_STORE_ENDPOINT;
 
-const HTTPS_SECRETS = JSON.parse( fs.readFileSync("/run/secrets/DATABOX_PEM") );
-var credentials = {
-  key:  HTTPS_SECRETS.clientprivate || '',
-  cert: HTTPS_SECRETS.clientcert || '',
-};		
+const credentials = databox.getHttpsCredentials();
+
 const PORT = process.env.port || '8080';
 
 const config = require('./routes/config');
