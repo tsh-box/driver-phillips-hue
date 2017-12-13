@@ -199,7 +199,7 @@ Promise.resolve()
                     DataSourceType: 'set-bulb-on',
                     DataSourceID: 'set-bulb-on-' + light.id,
                     StoreType: 'ts',
-                    isActuator:true
+                    IsActuator:true
                   })
                   .then(()=>{
                     ObserveProperty('set-bulb-on-' + light.id);
@@ -214,7 +214,7 @@ Promise.resolve()
                     DataSourceType: 'set-bulb-hue',
                     DataSourceID: 'set-bulb-hue-' + light.id,
                     StoreType: 'ts',
-                    isActuator:true
+                    IsActuator:true
                   })
                   .then(()=>{
                     ObserveProperty('set-bulb-hue-' + light.id);
@@ -228,7 +228,7 @@ Promise.resolve()
                     DataSourceType: 'set-bulb-bri',
                     DataSourceID: 'set-bulb-bri-' + light.id,
                     StoreType: 'ts',
-                    isActuator:true
+                    IsActuator:true
                   })
                   .then(()=>{
                     ObserveProperty('set-bulb-bri-' + light.id);
@@ -242,7 +242,7 @@ Promise.resolve()
                     DataSourceType: 'set-bulb-sat',
                     DataSourceID: 'set-bulb-sat-' + light.id,
                     StoreType: 'ts',
-                    isActuator:true
+                    IsActuator:true
                   })
                   .then(()=>{
                     ObserveProperty('set-bulb-sat-' + light.id);
@@ -256,7 +256,7 @@ Promise.resolve()
                     DataSourceType: 'set-bulb-ct',
                     DataSourceID: 'set-bulb-ct' + light.id,
                     StoreType: 'ts',
-                    isActuator:true
+                    IsActuator:true
                   })
                   .then(()=>{
                     ObserveProperty('set-bulb-ct-' + light.id);
