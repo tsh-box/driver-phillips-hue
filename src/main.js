@@ -72,6 +72,8 @@ var vendor = "Philips Hue";
 
 function ObserveProperty (dsID) {
 
+  console.log("[Observing] ",dsID);
+
   //Deal with actuation events
   kvc.Observe(dsID)
   .then((actuationEmitter)=>{
@@ -90,6 +92,9 @@ function ObserveProperty (dsID) {
       console.log("[warn] error received",dsID, error);
     });
 
+  })
+  .catch((err) => {
+    console.warn("[Error Observing] ",dsID,err);
   });
 
 }
