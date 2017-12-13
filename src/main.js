@@ -150,107 +150,120 @@ Promise.resolve()
                   DataSourceType: 'bulb-on',
                   DataSourceID: 'bulb-on-' + light.id,
                   StoreType: 'ts'
-                });
-                tsc.RegisterDatasource({
-                  Description: light.name + ' hue value.',
-                  ContentType: 'text/json',
-                  Vendor: vendor,
-                  DataSourceType: 'bulb-hue',
-                  DataSourceID: 'bulb-hue-' + light.id,
-                  StoreType: 'ts'
-                });
-                tsc.RegisterDatasource({
-                  Description: light.name + ' brightness value.',
-                  ContentType: 'text/json',
-                  Vendor: vendor,
-                  DataSourceType: 'bulb-bri',
-                  DataSourceID: 'bulb-bri-' + light.id,
-                  StoreType: 'ts'
-                });
-                tsc.RegisterDatasource({
-                  Description: light.name + ' saturation value.',
-                  ContentType: 'text/json',
-                  Vendor: vendor,
-                  DataSourceType: 'bulb-sat',
-                  DataSourceID: 'bulb-sat-' + light.id,
-                  StoreType: 'ts'
-                });
-                tsc.RegisterDatasource({
-                  Description: light.name + ' color temperature value.',
-                  ContentType: 'text/json',
-                  Vendor: vendor,
-                  DataSourceType: 'bulb-ct',
-                  DataSourceID: 'bulb-ct' + light.id,
-                  StoreType: 'ts'
-                });
-
-                //register actuators
-                tsc.RegisterDatasource({
-                  Description: 'Set ' + light.name + ' bulbs on off state.',
-                  ContentType: 'text/json',
-                  Vendor: vendor,
-                  DataSourceType: 'set-bulb-on',
-                  DataSourceID: 'set-bulb-on-' + light.id,
-                  StoreType: 'ts',
-                  isActuator:true
                 })
                 .then(()=>{
-                  ObserveProperty('set-bulb-on-' + light.id);
+                  return tsc.RegisterDatasource({
+                    Description: light.name + ' hue value.',
+                    ContentType: 'text/json',
+                    Vendor: vendor,
+                    DataSourceType: 'bulb-hue',
+                    DataSourceID: 'bulb-hue-' + light.id,
+                    StoreType: 'ts'
+                  });
+                })
+                .then(()=>{
+                  return tsc.RegisterDatasource({
+                    Description: light.name + ' brightness value.',
+                    ContentType: 'text/json',
+                    Vendor: vendor,
+                    DataSourceType: 'bulb-bri',
+                    DataSourceID: 'bulb-bri-' + light.id,
+                    StoreType: 'ts'
+                  });
+                })
+                .then(()=>{
+                  return tsc.RegisterDatasource({
+                    Description: light.name + ' saturation value.',
+                    ContentType: 'text/json',
+                    Vendor: vendor,
+                    DataSourceType: 'bulb-sat',
+                    DataSourceID: 'bulb-sat-' + light.id,
+                    StoreType: 'ts'
+                  });
+                })
+                .then(()=>{
+                  return tsc.RegisterDatasource({
+                    Description: light.name + ' color temperature value.',
+                    ContentType: 'text/json',
+                    Vendor: vendor,
+                    DataSourceType: 'bulb-ct',
+                    DataSourceID: 'bulb-ct' + light.id,
+                    StoreType: 'ts'
+                  });
+                })
+                .then(()=>{
+                  return tsc.RegisterDatasource({
+                    Description: 'Set ' + light.name + ' bulbs on off state.',
+                    ContentType: 'text/json',
+                    Vendor: vendor,
+                    DataSourceType: 'set-bulb-on',
+                    DataSourceID: 'set-bulb-on-' + light.id,
+                    StoreType: 'ts',
+                    isActuator:true
+                  })
+                  .then(()=>{
+                    ObserveProperty('set-bulb-on-' + light.id);
+                  });
+
+                })
+                .then(()=>{
+                  return tsc.RegisterDatasource({
+                    Description: 'Set ' + light.name + ' hue value.',
+                    ContentType: 'text/json',
+                    Vendor: vendor,
+                    DataSourceType: 'set-bulb-hue',
+                    DataSourceID: 'set-bulb-hue-' + light.id,
+                    StoreType: 'ts',
+                    isActuator:true
+                  })
+                  .then(()=>{
+                    ObserveProperty('set-bulb-hue-' + light.id);
+                  });
+                })
+                .then(()=>{
+                  return tsc.RegisterDatasource({
+                    Description:'Set ' + light.name + ' brightness value.',
+                    ContentType: 'text/json',
+                    Vendor: vendor,
+                    DataSourceType: 'set-bulb-bri',
+                    DataSourceID: 'set-bulb-bri-' + light.id,
+                    StoreType: 'ts',
+                    isActuator:true
+                  })
+                  .then(()=>{
+                    ObserveProperty('set-bulb-bri-' + light.id);
+                  });
+                })
+                .then(()=>{
+                  return tsc.RegisterDatasource({
+                    Description: 'Set ' + light.name + ' saturation value.',
+                    ContentType: 'text/json',
+                    Vendor: vendor,
+                    DataSourceType: 'set-bulb-sat',
+                    DataSourceID: 'set-bulb-sat-' + light.id,
+                    StoreType: 'ts',
+                    isActuator:true
+                  })
+                  .then(()=>{
+                    ObserveProperty('set-bulb-sat-' + light.id);
+                  });
+                })
+                .then(()=>{
+                  return tsc.RegisterDatasource({
+                    Description: 'Set ' + light.name + ' color temperature value.',
+                    ContentType: 'text/json',
+                    Vendor: vendor,
+                    DataSourceType: 'set-bulb-ct',
+                    DataSourceID: 'set-bulb-ct' + light.id,
+                    StoreType: 'ts',
+                    isActuator:true
+                  })
+                  .then(()=>{
+                    ObserveProperty('set-bulb-ct-' + light.id);
+                  });
                 })
                 .catch((err)=>{
-                  console.log("[Error] registering actuator ", err);
-                });
-
-                tsc.RegisterDatasource({
-                  Description: 'Set ' + light.name + ' hue value.',
-                  ContentType: 'text/json',
-                  Vendor: vendor,
-                  DataSourceType: 'set-bulb-hue',
-                  DataSourceID: 'set-bulb-hue-' + light.id,
-                  StoreType: 'ts',
-                  isActuator:true
-                })
-                .then(()=>{
-                  ObserveProperty('set-bulb-hue-' + light.id);
-                });
-
-                tsc.RegisterDatasource({
-                  Description:'Set ' + light.name + ' brightness value.',
-                  ContentType: 'text/json',
-                  Vendor: vendor,
-                  DataSourceType: 'set-bulb-bri',
-                  DataSourceID: 'set-bulb-bri-' + light.id,
-                  StoreType: 'ts',
-                  isActuator:true
-                })
-                .then(()=>{
-                  ObserveProperty('set-bulb-bri-' + light.id);
-                });
-
-                tsc.RegisterDatasource({
-                  Description: 'Set ' + light.name + ' saturation value.',
-                  ContentType: 'text/json',
-                  Vendor: vendor,
-                  DataSourceType: 'set-bulb-sat',
-                  DataSourceID: 'set-bulb-sat-' + light.id,
-                  StoreType: 'ts',
-                  isActuator:true
-                })
-                .then(()=>{
-                  ObserveProperty('set-bulb-sat-' + light.id);
-                });
-
-                tsc.RegisterDatasource({
-                  Description: 'Set ' + light.name + ' color temperature value.',
-                  ContentType: 'text/json',
-                  Vendor: vendor,
-                  DataSourceType: 'set-bulb-ct',
-                  DataSourceID: 'set-bulb-ct' + light.id,
-                  StoreType: 'ts',
-                  isActuator:true
-                })
-                .then(()=>{
-                  ObserveProperty('set-bulb-ct-' + light.id);
+                  console.warn(err);
                 });
 
               } else {
