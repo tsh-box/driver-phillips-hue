@@ -75,16 +75,17 @@ function ObserveProperty (dsID) {
   console.log("[Observing] ",dsID);
 
   //Deal with actuation events
-  kvc.Observe(dsID)
+  tsc.Observe(dsID)
   .then((actuationEmitter)=>{
+
     actuationEmitter.on('data',(data)=>{
       console.log("[Actuation] data received",dsID, data);
 
       const tmp = dsID.split('-');
       const hueType = tmp[2];
       const hueId = tmp[3];
-
-      hue.setLights(hueId,hueType,data.data);
+      _data = JSON.parse(data);
+      hue.setLights(hueId,hueType,_data.data);
 
     });
 
@@ -208,6 +209,9 @@ Promise.resolve()
                   })
                   .then(()=>{
                     ObserveProperty('set-bulb-on-' + light.id);
+                  })
+                  .catch((err)=>{
+                    console.warn(err)
                   });
 
                 })
@@ -274,7 +278,6 @@ Promise.resolve()
               } else {
 
                 //Update bulb state
-                console.log("WRITING for bulb", light.id, " Values::", light.state.on, light.state.hue, light.state.bri,light.state.sat,light.state.ct);
                 tsc.Write('bulb-on-'  + light.id, { data:light.state.on });
                 tsc.Write('bulb-hue-' + light.id, { data:light.state.hue });
                 tsc.Write('bulb-bri-' + light.id, { data:light.state.bri });
@@ -318,7 +321,6 @@ Promise.resolve()
                 });
               } else {
                 // update state
-                console.log("WRITING SENSOR DATA::", 'hue-'+formatSensorID(sensor.uniqueid),sensor.state);
                 tsc.Write('hue-'+formatSensorID(sensor.uniqueid),sensor.state)
                 .catch((error)=>{
                   console.log("[ERROR] writing sensor data", error);
